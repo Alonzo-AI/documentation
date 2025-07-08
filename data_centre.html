@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Data Centre</title>
+    <style>
+        /* Basic Reset & Font */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif; /* Mimicking a common sans-serif font */
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f8f8;
+        }
+
+        /* Color Palette from Athlyte Sports website */
+        :root {
+            --primary-blue: #003d79; /* Deep blue, similar to Athlyte's primary */
+            --dark-blue: #0068c2;    /* Darker blue, for strong accents/hover */
+            --light-gray: #f5f7fa;   /* Light background, off-white */
+            --medium-gray: #eaf4ff;  /* Very light blue/gray for subtle backgrounds */
+            --dark-gray: #14213d;    /* Dark text/elements */
+            --text-color: #003d79;   /* General text color */
+            --border-color: #dfe7ef; /* Light border color */
+            --code-bg: #f0f4f8;      /* Slightly darker light background for code blocks */
+            --code-text: #c7254e;    /* Retained for code readability */
+            --success-green: #28a745; /* Standard green for success, good contrast */
+            --warning-orange: #ffb703; /* Bright orange, similar to Athlyte's accent */
+            --info-cyan: #00b4d8;    /* Cyan/light blue, similar to Athlyte's secondary */
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-blue); /* Changed to primary blue */
+            color: #fff;
+            padding: 20px;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h2 {
+            color: #fff;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            color: #fff;
+            padding: 10px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: var(--dark-blue); /* Darker blue on hover */
+            border-radius: 4px;
+            padding-left: 5px; /* Slight indent on hover */
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px; /* Offset by sidebar width */
+            flex-grow: 1;
+            padding: 30px;
+            background-color: var(--light-gray); /* Changed to light gray */
+        }
+
+        .main-content section {
+            background-color: #fff; /* Keep sections white for contrast */
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 30px;
+            padding: 25px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .main-content h1 {
+            color: var(--primary-blue); /* Primary blue for main heading */
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-blue);
+        }
+
+        .main-content h2 {
+            color: var(--text-color); /* Dark text color */
+            font-size: 1.8em;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        .main-content h3 {
+            color: var(--text-color); /* Dark text color */
+            font-size: 1.4em;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .main-content p {
+            margin-bottom: 10px;
+            color: var(--text-color); /* Ensure paragraph text uses text color */
+        }
+
+        /* API Method Tags */
+        .api-method {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #fff;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            margin-right: 10px;
+        }
+
+        .method-get { background-color: var(--success-green); }
+        .method-post { background-color: var(--info-cyan); }
+        .method-put { background-color: var(--warning-orange); }
+        .method-delete { background-color: #dc3545; } /* Red for delete, good contrast */
+
+        /* Endpoint Paths */
+        .endpoint-path {
+            font-family: monospace;
+            background-color: var(--medium-gray); /* Light blue/gray for paths */
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: var(--dark-blue); /* Darker blue for path text */
+            font-size: 0.95em;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+            color: var(--text-color); /* Ensure table text uses text color */
+        }
+
+        table th {
+            background-color: var(--medium-gray); /* Light blue/gray for table headers */
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--code-bg); /* Code background color */
+            color: var(--code-text);
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+            margin-top: 15px;
+            position: relative;
+        }
+
+        code {
+            font-family: monospace;
+            background-color: var(--code-bg);
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: var(--code-text);
+        }
+
+        /* Collapsible Sections */
+        .collapsible-header {
+            cursor: pointer;
+            background-color: var(--medium-gray); /* Light blue/gray for collapsible headers */
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .collapsible-header:hover {
+            background-color: var(--dark-blue); /* Darker blue on hover */
+            color: #fff;
+        }
+
+        .collapsible-content {
+            display: none;
+            padding: 15px 0;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            background-color: var(--light-gray); /* Light gray for content background */
+        }
+
+        .collapsible-content.show {
+            display: block;
+        }
+
+        .collapsible-header::after {
+            content: '+';
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible-header.active::after {
+            content: '-';
+            transform: rotate(180deg);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                box-shadow: none;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+            .sidebar ul {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            .sidebar ul li a {
+                padding: 8px 12px;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 5px;
+                text-align: center;
+            }
+            .sidebar h2 {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Data Centre</h2>
+            <ul>
+                <li><a href="#mfb">Men's Football</a></li>
+                <li><a href="#mbb">Men's Basketball</a></li>
+                <li><a href="#wbb">Women's Basketball</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <section id="mfb">
+                <h1>Statistics Data Centre</h1>
+                <p>This comprehensive data centre provides detailed information on all the statistics utilized across the project, offering a valuable resource for understanding and integrating sports data.</p>
+
+                <h2>Men's Football</h2>
+                <h3>Offense</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Statistic Name</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>s_assists</td><td>Total number of assists made.</td></tr>
+                        <tr><td>s_assists_turnover_ratio</td><td>Ratio of assists to turnovers.</td></tr>
+                        <tr><td>s_bench_points</td><td>Points scored by players coming off the bench.</td></tr>
+                        <tr><td>s_biggest_leads</td><td>The largest lead achieved by the team.</td></tr>
+                        <tr><td>s_biggest_lead_scores</td><td>The score when the biggest lead was achieved.</td></tr>
+                        <tr><td>s_biggest_scoring_runs</td><td>The longest consecutive scoring run by the team.</td></tr>
+                        <tr><td>s_biggest_scoring_run_scores</td><td>The score during the biggest scoring run.</td></tr>
+                        <tr><td>s_blocks_received</td><td>Number of shots blocked by the opponent.</td></tr>
+                        <tr><td>s_efficiency</td><td>Overall efficiency rating of the team's offense.</td></tr>
+                        <tr><td>s_efficiency_game_scores</td><td>Game score based on efficiency.</td></tr>
+                        <tr><td>s_fast_break_points_attempted</td><td>Total fast break points attempted.</td></tr>
+                        <tr><td>s_fast_break_points_made</td><td>Total fast break points made.</td></tr>
+                        <tr><td>s_fast_break_points_percentages</td><td>Percentage of fast break points made.</td></tr>
+                        <tr><td>s_field_goals_attempted</td><td>Total field goals attempted.</td></tr>
+                        <tr><td>s_field_goals_effective_adjusted</td><td>Effective field goal percentage adjusted for three-pointers.</td></tr>
+                        <tr><td>s_field_goals_effective_percentages</td><td>Effective field goal percentage.</td></tr>
+                        <tr><td>s_field_goals_made</td><td>Total field goals made.</td></tr>
+                        <tr><td>s_field_goals_percentages</td><td>Percentage of field goals made.</td></tr>
+                        <tr><td>s_free_throws_attempted</td><td>Total free throws attempted.</td></tr>
+                        <tr><td>s_free_throws_made</td><td>Total free throws made.</td></tr>
+                        <tr><td>s_free_throws_percentages</td><td>Percentage of free throws made.</td></tr>
+                        <tr><td>s_lead_changes</td><td>Total number of lead changes in the game.</td></tr>
+                        <tr><td>s_offensive_points_per_possessions</td><td>Points scored per offensive possession.</td></tr>
+                        <tr><td>s_offensive_ratings</td><td>Offensive rating of the team.</td></tr>
+                        <tr><td>s_points_fast_breaks</td><td>Points scored on fast breaks.</td></tr>
+                        <tr><td>s_points_from_turnovers</td><td>Points scored directly after opponent turnovers.</td></tr>
+                        <tr><td>s_points_in_the_paint</td><td>Points scored from inside the painted area.</td></tr>
+                        <tr><td>s_points_in_the_paint_attempted</td><td>Total attempts for points in the paint.</td></tr>
+                        <tr><td>s_points_in_the_paint_made</td><td>Total points made in the paint.</td></tr>
+                        <tr><td>s_points_in_the_paint_percentages</td><td>Percentage of points made in the paint.</td></tr>
+                        <tr><td>s_points_second_chances</td><td>Points scored from offensive rebounds.</td></tr>
+                        <tr><td>s_rebounds_offensives</td><td>Total offensive rebounds.</td></tr>
+                        <tr><td>s_rebounds_offensive_deadballs</td><td>Offensive rebounds from deadball situations.</td></tr>
+                        <tr><td>s_rebounds_offensive_percentages</td><td>Percentage of offensive rebounds.</td></tr>
+                        <tr><td>s_second_chance_points_attempted</td><td>Total attempts for second chance points.</td></tr>
+                        <tr><td>s_second_chance_points_made</td><td>Total second chance points made.</td></tr>
+                        <tr><td>s_second_chance_points_percentages</td><td>Percentage of second chance points made.</td></tr>
+                        <tr><td>s_three_pointers_attempted</td><td>Total three-pointers attempted.</td></tr>
+                        <tr><td>s_three_pointers_made</td><td>Total three-pointers made.</td></tr>
+                        <tr><td>s_three_pointers_percentages</td><td>Percentage of three-pointers made.</td></tr>
+                        <tr><td>s_transition_offences</td><td>Points scored in transition offense.</td></tr>
+                        <tr><td>s_true_shooting_attempts</td><td>Total true shooting attempts (includes FGs, 3PTs, FTs).</td></tr>
+                        <tr><td>s_true_shooting_percentages</td><td>True shooting percentage.</td></tr>
+                        <tr><td>s_turnovers</td><td>Total number of turnovers committed.</td></tr>
+                        <tr><td>s_turnovers_percentages</td><td>Percentage of possessions ending in a turnover.</td></tr>
+                        <tr><td>s_turnovers_teams</td><td>Team turnovers.</td></tr>
+                        <tr><td>s_two_pointers_attempted</td><td>Total two-pointers attempted.</td></tr>
+                        <tr><td>s_two_pointers_made</td><td>Total two-pointers made.</td></tr>
+                        <tr><td>s_two_pointers_percentages</td><td>Percentage of two-pointers made.</td></tr>
+                        <tr><td>s_usage_percentage</td><td>Percentage of team possessions used by a player.</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Defense</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Statistic Name</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>s_blocks</td><td>Number</td></tr>
+                        <tr><td>s_defensive_points_per_possessions</td><td>Number</td></tr>
+                        <tr><td>s_defensive_ratings</td><td>Number</td></tr>
+                        <tr><td>s_rebounds_defensives</td><td>Number</td></tr>
+                        <tr><td>s_rebounds_defensive_deadballs</td><td>Number</td></tr>
+                        <tr><td>s_rebounds_defensive_percentages</td><td>Number</td></tr>
+                        <tr><td>s_rebounds_team_defensives</td><td>Number</td></tr>
+                        <tr><td>s_rebounds_team_offensives</td><td>Number</td></tr>
+                        <tr><td>s_steals</td><td>Number</td></tr>
+                        <tr><td>s_transition_defence</td><td>Number</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Fouls</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Statistic Name</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>s_fouled_out</td><td>Number</td></tr>
+                        <tr><td>s_fouls_bench_technicals</td><td>Number</td></tr>
+                        <tr><td>s_fouls_coach_technicals</td><td>Number</td></tr>
+                        <tr><td>s_fouls_offensives</td><td>Number</td></tr>
+                        <tr><td>s_fouls_ons</td><td>Number</td></tr>
+                        <tr><td>s_fouls_personals</td><td>Number</td></tr>
+                        <tr><td>s_fouls_teams</td><td>Number</td></tr>
+                        <tr><td>s_fouls_technicals</td><td>Number</td></tr>
+                        <tr><td>s_fouls_total</td><td>Number</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Generals</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Statistic Name</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>s_minus</td><td>Number</td></tr>
+                        <tr><td>s_minutes</td><td>Number</td></tr>
+                        <tr><td>s_pluss</td><td>Number</td></tr>
+                        <tr><td>s_plus_minus</td><td>Number</td></tr>
+                        <tr><td>s_pointss</td><td>Number</td></tr>
+                        <tr><td>s_points_againsts</td><td>Number</td></tr>
+                        <tr><td>s_possessionss</td><td>Number</td></tr>
+                        <tr><td>s_possessions_opponents</td><td>Number</td></tr>
+                        <tr><td>s_rebounds_personals</td><td>Number</td></tr>
+                        <tr><td>s_rebounds_teams</td><td>Number</td></tr>
+                        <tr><td>s_rebounds_totals</td><td>Number</td></tr>
+                        <tr><td>s_time_leadings</td><td>Number</td></tr>
+                        <tr><td>s_times_scores_level</td><td>Number</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="mbb">
+                <h2>Men's Basketball</h2>
+                <p>Access and manage basketball competitions within leagues.</p>
+                <h3>Fouls</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Statistic Name</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>s_assists</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td>s_assists_turnover_ratio</td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td>s_bench_points</td>
+                            <td>No</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Fouls</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Statistic Name</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>s_assists</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td>s_assists_turnover_ratio</td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td>s_bench_points</td>
+                            <td>No</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Fouls</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Statistic Name</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>s_assists</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td>s_assists_turnover_ratio</td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td>s_bench_points</td>
+                            <td>No</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="wbb">
+                <h2>Women's Basketball</h2>
+                <p>Manage and retrieve information about basketball clubs.</p>
+
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scrolling for sidebar navigation
+            document.querySelectorAll('.sidebar ul li a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                        // Update URL hash without page reload
+                        history.pushState(null, null, targetId);
+                    }
+                });
+            });
+
+            // Collapsible sections functionality
+            document.querySelectorAll('.collapsible-header').forEach(header => {
+                header.addEventListener('click', function () {
+                    this.classList.toggle('active');
+                    const content = this.nextElementSibling;
+                    if (content.classList.contains('show')) {
+                        content.classList.remove('show');
+                        content.style.maxHeight = null; // Reset max-height
+                    } else {
+                        content.classList.add('show');
+                        content.style.maxHeight = content.scrollHeight + "px"; // Set max-height for smooth transition
+                    }
+                });
+            });
+
+            // Adjust max-height on window resize for collapsible content
+            window.addEventListener('resize', () => {
+                document.querySelectorAll('.collapsible-content.show').forEach(content => {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                });
+            });
+
+            // Highlight active sidebar link based on scroll position
+            const sections = document.querySelectorAll('.main-content section');
+            const sidebarLinks = document.querySelectorAll('.sidebar ul li a');
+
+            const observerOptions = {
+                root: null, // viewport
+                rootMargin: '0px',
+                threshold: 0.3 // Trigger when 30% of the section is visible
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const currentId = entry.target.id;
+                        sidebarLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${currentId}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // Initial highlight for the first section if page loads at top
+            if (sections.length > 0) {
+                sidebarLinks[0].classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
